@@ -1,0 +1,143 @@
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+
+  <title>Україна в цифрах - статистика економіки України</title>
+
+  <link rel="stylesheet" href="css/bootstrap.min.css" type="text/css" media="all" />
+  <link rel="stylesheet" href="css/style.css" type="text/css" media="all" />
+  <script src="js/highcharts-custom.js" type="text/javascript" charset="utf-8"></script>
+</head>
+<body>
+  <div class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <a href="#top" class="navbar-brand">Початок</a>
+        <button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#navbar-main">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+      </div>
+      <div class="navbar-collapse collapse" id="navbar-main">
+        <ul class="nav navbar-nav">
+          <li>
+            <a href="#GDP">ВВП України</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <a name="top">&nbsp;</a>
+  <div class="container">
+    <div class="jumbotron">
+      <h1>Україна в цифрах</h1>
+      <p>на цій сторінці зібрано якомога більше статистичних даних про економіку України.</p>
+    </div>
+
+    <a name="GDP">&nbsp;</a>
+    <div>
+      <h2>ВВП України / GDP of Ukraine</h2>
+      <div class="chart">
+        <div id="chart1"><h3>Загальний ВВП України</h3></div>
+        <script type="text/javascript" charset="utf-8">
+          var chart = new Highcharts.Chart({
+            chart: {
+              renderTo: 'chart1'
+            },
+            title: {
+              text: 'Загальний ВВП України',
+            },
+            subtitle: {
+              text: 'Source: <a href="http://data.worldbank.org/indicator/NY.GDP.MKTP.CD/countries/UA?display=graph">World Bank</a>',
+            },
+
+            xAxis: {
+              categories: ["2005", "2006", "2007", "2008", "2009", "2010", "2011", "2012", "2013"]
+            },
+
+            yAxis: {
+              title: {
+                text: 'млрд $'
+              },
+              min: 0
+            },
+
+            tooltip: {
+              valuePrefix: '$',
+              valueSuffix: ' млрд.'
+            },
+
+            series: [{
+              name: "Номінальний",
+              data: [86.14, 107.75, 142.72, 179.99, 117.23, 136.42, 163.42, 176.6, 177.43]
+            },{
+              name: "ПКС",
+              data: [301.67, 332.11, 368.33, 386.52, 327.8, 347.91, 373.53, 395.49, 407.85]
+            }]
+
+          });
+        </script>
+      </div>
+      <div class="chart">
+        <div id="chart2"><h3>ВВП України на душу населення (ПКС)</h3></div>
+        <script type="text/javascript" charset="utf-8">
+          var chart = new Highcharts.Chart({
+            chart: {
+              renderTo: 'chart2'
+            },
+            title: {
+              text: 'ВВП України на душу населення (ПКС)',
+            },
+            subtitle: {
+              text: 'Source: <a href="http://data.worldbank.org/indicator/NY.GNP.PCAP.PP.CD/countries/UA-MD-BY-RU-KZ-AZ-PL-HU?page=1&display=graph">World Bank</a>',
+            },
+
+            xAxis: {
+              categories: ["2005", "2006", "2007", "2008", "2009", "2010", "2011", "2012", "2013"]
+            },
+
+            yAxis: {
+              title: {
+                text: '$'
+              },
+              min: 0
+            },
+
+            tooltip: {
+              valuePrefix: '$'
+            },
+
+            series: [{
+              name: "Україна",
+              data: [6400, 7100, 7920, 8360, 7120, 7580, 8170, 8670, 8970]
+            },{
+              name: "Росія",
+              data: [11570, 14540, 16360, 19710, 18850, 19910, 21860, 22710, 23190]
+            },{
+              name: "Азербайджан",
+              data: [6280, 8570, 10560, 12310, 13720, 14600, 14590, 14870, 16180]
+            },{
+              name: "Білорусь",
+              data: [9680, 10990, 12230, 13730, 13760, 15060, 16410, 16810, 16950]
+            },{
+              name: "Молдова",
+              data: [3300, 3560, 3700, 4090, 3740, 4160, 4520, 4710, 5180]
+            },{
+              name: "Казахстан",
+              data: [12600, 13870, 15210, 15440, 15970, 16690, 17710, 18870, 20680]
+            },{
+              name: "Польща",
+              data: [13720, 14930, 16390, 17930, 18600, 19910, 21290, 21830, 22790]
+            },{
+              name: "Угорщина",
+              data: [16340, 17660, 17990, 19470, 19930, 20480, 21650, 21620, 22800]
+            }]
+          });
+        </script>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
