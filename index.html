@@ -164,6 +164,118 @@
           });
         </script>
       </div>
+      <div class="chart row">
+        <div class="col-lg-6">
+          <div id="chart3"><h3>Структура ВВП України (%)</h3></div>
+          <script type="text/javascript" charset="utf-8">
+
+            var chart = new Highcharts.Chart({
+              chart: {
+                renderTo: 'chart3',
+                zoomType: 'x',
+                type: 'area'
+              },
+              title: {
+                text: 'Структура ВВП України (%)',
+              },
+              subtitle: {
+                text: 'Structure of GDP (% of GDP), Source: <a href="http://data.worldbank.org/indicator/NV.AGR.TOTL.ZS/countries/UA?display=default">World Bank</a>',
+              },
+              xAxis: {
+                categories: generateDates(1990, 2013),
+                labels: {
+                  rotation: -45
+                }
+              },
+              yAxis: {
+                title: {
+                  text: 'відсотків'
+                }
+              },
+              tooltip: {
+                pointFormat: '<span style="color:{series.color}">{series.name}</span>: <b>{point.percentage:.1f}%</b><br/>',
+                shared: true
+              },
+              plotOptions: {
+                area: {
+                  stacking: 'percent',
+                  lineColor: '#ffffff',
+                  lineWidth: 1,
+                  marker: {
+                    lineWidth: 1,
+                    lineColor: '#ffffff'
+                  }
+                }
+              },
+              series: [{
+                name: 'Сільське господарство',
+                data: globalData['UA']['GDP_%_agriculture']
+              }, {
+                name: 'Промисловість',
+                data: globalData['UA']['GDP_%_industry']
+              }, {
+                name: 'Послуги',
+                data: globalData['UA']['GDP_%_services']
+              }]
+            });
+          </script>
+        </div>
+        <div class="col-lg-6">
+          <div id="chart4"><h3>Зайнятість населення України (%)</h3></div>
+          <script type="text/javascript" charset="utf-8">
+
+            var chart = new Highcharts.Chart({
+              chart: {
+                renderTo: 'chart4',
+                zoomType: 'x',
+                type: 'area'
+              },
+              title: {
+                text: 'Зайнятість населення України (%)',
+              },
+              subtitle: {
+                text: 'Employment structure (% of GDP), Source: <a href="http://data.worldbank.org/indicator/SL.AGR.EMPL.ZS/countries/UA?display=default">World Bank</a>',
+              },
+              xAxis: {
+                categories: generateDates(1990, 2012),
+                labels: {
+                  rotation: -45
+                }
+              },
+              yAxis: {
+                title: {
+                  text: 'відсотків'
+                }
+              },
+              tooltip: {
+                pointFormat: '<span style="color:{series.color}">{series.name}</span>: <b>{point.percentage:.1f}%</b><br/>',
+                shared: true
+              },
+              plotOptions: {
+                area: {
+                  stacking: 'percent',
+                  lineColor: '#ffffff',
+                  lineWidth: 1,
+                  marker: {
+                    lineWidth: 1,
+                    lineColor: '#ffffff'
+                  }
+                }
+              },
+              series: [{
+                name: 'Сільське господарство',
+                data: yearPrefix(globalData['UA']['employment_agriculture'], 1990)
+              }, {
+                name: 'Промисловість',
+                data: yearPrefix(globalData['UA']['employment_industry'], 1990)
+              }, {
+                name: 'Послуги',
+                data: yearPrefix(globalData['UA']['employment_services'], 1990)
+              }]
+            });
+          </script>
+        </div>
+      </div>
     </div>
   </div>
 </body>
