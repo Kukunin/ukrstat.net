@@ -22,6 +22,17 @@ var yearPrefix = function(data, startYear) {
   }
   return array;
 }
+var truncate = function(string, length) {
+  if (!length) length = 30;
+  if (string.length > length) {
+    var words = string.split(" ");
+    for(var i = 0; i < words.length; i++) {
+      if (words.slice(0, i).join(" ").length > length) break;
+    }
+    string = words.slice(0, i).join(" ") + "...";
+  }
+  return string;
+}
 var tradeCategories = ['Сільське господарство', 'Сировина', 'Промисловість', 'Послуги', 'Різне']
 var globalData = {
   "UA": {
