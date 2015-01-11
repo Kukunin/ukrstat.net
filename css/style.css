@@ -9,3 +9,13 @@ a[name] {
 .chart + .chart {
   margin-top:2em;
 }
+.likes {
+  margin: 2em 0;
+  float:left;
+}
+.likes .like {
+  float:left;
+}
+.likes .like + .like {
+  margin-left: 1em;
+}
