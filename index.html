@@ -28,6 +28,9 @@
           <li>
             <a href="#GDP">ВВП України</a>
           </li>
+          <li>
+            <a href="#trade">Зовнішня торгівля</a>
+          </li>
         </ul>
       </div>
     </div>
@@ -277,6 +280,115 @@
             });
           </script>
         </div>
+      </div>
+    </div><!-- GDP -->
+
+    <a name="trade" id="trade">&nbsp;</a>
+    <div>
+      <h2>Зовнішня торгівля / Foreign Trade</h2>
+      <div class="chart">
+        <div id="chart5"><h3>Експорт та Імпорт України 2013</h3></div>
+        <script type="text/javascript" charset="utf-8">
+        var colors = Highcharts.getOptions().colors,
+            categories = ['Експорт', 'Імпорт'],
+            exports = [0, 0, 0, 0, 0],
+            imports = [0, 0, 0, 0, 0],
+            total = [0, 0];
+
+        globalData['UA']['trade'][2013].forEach(function(value, key) {
+          exports[value[1]] += value[2];
+          imports[value[1]] += value[3];
+          total[0] += value[2];
+          total[1] += value[3];
+        });
+
+        total = divideData(total, 1000, 2);
+
+        var data = [{
+          y: total[0],
+          color: colors[2],
+          drilldown: {
+            categories: tradeCategories,
+            data: divideData(exports, 1000, 2),
+          }
+        }, {
+          y: total[1],
+          color: colors[3],
+          drilldown: {
+            categories: tradeCategories,
+            data: divideData(imports, 1000, 2),
+          }
+        }];
+
+        var tradeData = [],
+            categoriesData = [],
+            i,
+            j,
+            brightness;
+
+
+        // Build the data arrays
+        for (i = 0; i < data.length; i += 1) {
+          // add browser data
+          tradeData.push({
+            name: categories[i],
+            y: data[i].y,
+            color: data[i].color
+          });
+
+          // add version data
+          var drillDataLen = data[i].drilldown.data.length;
+          for (j = 0; j < drillDataLen; j += 1) {
+            brightness = 0.2 - (j / drillDataLen) / 5;
+            categoriesData.push({
+              name: data[i].drilldown.categories[j],
+              y: data[i].drilldown.data[j],
+              color: Highcharts.Color(data[i].color).brighten(brightness).get()
+            });
+          }
+        }
+
+        // Create the chart
+        var chart = new Highcharts.Chart({
+          chart: {
+            renderTo: 'chart5',
+            type: 'pie'
+          },
+          title: {
+            text: 'Експорт та Імпорт України 2013, млн $'
+          },
+          subtitle: {
+            text: 'Source: <a href="http://www.ukrstat.gov.ua/operativ/operativ2013/zd/tsztt/tsztt_u/tsztt1213_u.htm">Державна служба статистики України</a>',
+          },
+          plotOptions: {
+            pie: {
+              shadow: false,
+              center: ['50%', '50%']
+            }
+          },
+          tooltip: {
+            valuePrefix: '$',
+            valueSuffix: ' млн'
+          },
+          series: [{
+            name: 'Всього',
+            data: tradeData,
+            size: '60%',
+            dataLabels: {
+              color: 'white',
+              distance: -50
+            }
+          }, {
+            name: 'Всього',
+            data: categoriesData,
+            size: '80%',
+            innerSize: '60%',
+            dataLabels: {
+              format: '<b>{point.name}:</b> ${point.y:,.2f} млн'
+            }
+          }]
+        });
+        </script>
       </div>
     </div>
   </div><!-- container -->
