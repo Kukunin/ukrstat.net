@@ -290,23 +290,27 @@
         <div id="chart5"><h3>Експорт та Імпорт України 2013</h3></div>
         <script type="text/javascript" charset="utf-8">
         var colors = Highcharts.getOptions().colors,
-            categories = ['Експорт', 'Імпорт'],
+            types = ['Експорт', 'Імпорт'],
+            subcategories = [[], [], [], [], []],
             exports = [0, 0, 0, 0, 0],
             imports = [0, 0, 0, 0, 0],
             total = [0, 0];
 
+        //[name, category, export, import]
         globalData['UA']['trade'][2013].forEach(function(value, key) {
           exports[value[1]] += value[2];
           imports[value[1]] += value[3];
           total[0] += value[2];
           total[1] += value[3];
+
+          subcategories[value[1]].push(value);
         });
 
         total = divideData(total, 1000, 2);
 
         var data = [{
           y: total[0],
-          color: colors[2],
+          color: colors[0],
           drilldown: {
             categories: tradeCategories,
             data: divideData(exports, 1000, 2),
@@ -322,29 +326,43 @@
 
         var tradeData = [],
             categoriesData = [],
-            i,
-            j,
+            subCategoriesData = [],
             brightness;
 
 
         // Build the data arrays
-        for (i = 0; i < data.length; i += 1) {
+        for (var i = 0; i < data.length; i += 1) {
+          var type = data[i];
           // add browser data
           tradeData.push({
-            name: categories[i],
-            y: data[i].y,
-            color: data[i].color
+            name: types[i],
+            y: type.y,
+            color: type.color
           });
 
           // add version data
-          var drillDataLen = data[i].drilldown.data.length;
-          for (j = 0; j < drillDataLen; j += 1) {
-            brightness = 0.2 - (j / drillDataLen) / 5;
+          var drillDataLen = type.drilldown.data.length;
+          for (var j = 0; j < drillDataLen; j += 1) {
+            var category = type.drilldown.data[j];
+
+            brightness = 0.25 - (j / drillDataLen) / 4;
             categoriesData.push({
-              name: data[i].drilldown.categories[j],
-              y: data[i].drilldown.data[j],
-              color: Highcharts.Color(data[i].color).brighten(brightness).get()
+              name: type.drilldown.categories[j],
+              y: category,
+              color: Highcharts.Color(type.color).brighten(brightness).get()
             });
+
+            var subCategoriesLength = subcategories[j].length;
+            for (var q = 0; q < subcategories[j].length; q++) {
+              var subcategory = subcategories[j][q],
+                  subbrightness = 0.10 - (q / subCategoriesLength) / 10;
+
+              subCategoriesData.push({
+                name: subcategory[0],
+                y: subcategory[i+2],
+                color: Highcharts.Color(type.color).brighten(brightness-subbrightness-0.1).get()
+              });
+            }
           }
         }
 
@@ -352,7 +370,8 @@
         var chart = new Highcharts.Chart({
           chart: {
             renderTo: 'chart5',
-            type: 'pie'
+            type: 'pie',
+            height: 500
           },
           title: {
             text: 'Експорт та Імпорт України 2013, млн $'
@@ -373,7 +392,7 @@
           series: [{
             name: 'Всього',
             data: tradeData,
-            size: '60%',
+            size: '40%',
             dataLabels: {
               color: 'white',
               distance: -50
@@ -381,10 +400,21 @@
           }, {
             name: 'Всього',
             data: categoriesData,
-            size: '80%',
-            innerSize: '60%',
+            size: '70%',
+            innerSize: '40%',
             dataLabels: {
-              format: '<b>{point.name}:</b> ${point.y:,.2f} млн'
+              enabled: false
+            }
+          }, {
+            name: 'Всього',
+            data: subCategoriesData,
+            size: '85%',
+            innerSize: '70%',
+            dataLabels: {
+              crop: false,
+              formatter: function() {
+                return this.point.y > 4000000 ? '<b>' + truncate(this.point.name) + ':</b> $' + Highcharts.numberFormat(this.point.y, 2) + ' млн' : null;
+              }
             }
           }]
         });
