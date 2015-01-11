@@ -1,5 +1,6 @@
 body {
   padding: 5em 0;
+  position:relative;
 }
 a[name] {
   position:relative;
