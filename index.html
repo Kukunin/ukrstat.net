@@ -46,13 +46,14 @@
         <script type="text/javascript" charset="utf-8">
           var chart = new Highcharts.Chart({
             chart: {
-              renderTo: 'chart1'
+              renderTo: 'chart1',
+              zoomType: 'x'
             },
             title: {
               text: 'Загальний ВВП України',
             },
             subtitle: {
-              text: 'Source: <a href="http://data.worldbank.org/indicator/NY.GDP.MKTP.CD/countries/UA?display=graph">World Bank</a>',
+              text: 'GDP, PPP (current international $), Source: <a href="http://data.worldbank.org/indicator/NY.GDP.MKTP.CD/countries/UA?display=graph">World Bank</a>',
             },
 
             xAxis: {
@@ -87,17 +88,18 @@
         <script type="text/javascript" charset="utf-8">
           var chart = new Highcharts.Chart({
             chart: {
-              renderTo: 'chart2'
+              renderTo: 'chart2',
+              zoomType: 'x'
             },
             title: {
               text: 'ВВП України на душу населення (ПКС)',
             },
             subtitle: {
-              text: 'Source: <a href="http://data.worldbank.org/indicator/NY.GNP.PCAP.PP.CD/countries/UA-MD-BY-RU-KZ-AZ-PL-HU?page=1&display=graph">World Bank</a>',
+              text: 'GDP per capita, PPP (current international $), Source: <a href="http://data.worldbank.org/indicator/NY.GNP.PCAP.PP.CD/countries/UA-MD-BY-RU-KZ-AZ-PL-HU?page=1&display=graph">World Bank</a>',
             },
 
             xAxis: {
-              categories: ["2005", "2006", "2007", "2008", "2009", "2010", "2011", "2012", "2013"]
+              categories: generateDates(1990, 2013)
             },
 
             yAxis: {
@@ -113,28 +115,51 @@
 
             series: [{
               name: "Україна",
-              data: [6400, 7100, 7920, 8360, 7120, 7580, 8170, 8670, 8970]
+              data: globalData['UA']['GDP_PPP_capita']
             },{
               name: "Росія",
-              data: [11570, 14540, 16360, 19710, 18850, 19910, 21860, 22710, 23190]
+              visible: false,
+              data: globalData['RU']['GDP_PPP_capita']
             },{
               name: "Азербайджан",
-              data: [6280, 8570, 10560, 12310, 13720, 14600, 14590, 14870, 16180]
+              visible: false,
+              data: globalData['AZ']['GDP_PPP_capita']
             },{
               name: "Білорусь",
-              data: [9680, 10990, 12230, 13730, 13760, 15060, 16410, 16810, 16950]
+              visible: false,
+              data: globalData['BY']['GDP_PPP_capita']
             },{
               name: "Молдова",
-              data: [3300, 3560, 3700, 4090, 3740, 4160, 4520, 4710, 5180]
+              visible: false,
+              data: globalData['MD']['GDP_PPP_capita']
             },{
               name: "Казахстан",
-              data: [12600, 13870, 15210, 15440, 15970, 16690, 17710, 18870, 20680]
+              visible: false,
+              data: globalData['KZ']['GDP_PPP_capita']
             },{
               name: "Польща",
-              data: [13720, 14930, 16390, 17930, 18600, 19910, 21290, 21830, 22790]
+              visible: false,
+              data: globalData['PL']['GDP_PPP_capita']
             },{
               name: "Угорщина",
-              data: [16340, 17660, 17990, 19470, 19930, 20480, 21650, 21620, 22800]
+              visible: false,
+              data: globalData['HU']['GDP_PPP_capita']
+            },{
+              name: "США",
+              visible: false,
+              data: globalData['US']['GDP_PPP_capita']
+            },{
+              name: "ОАЕ",
+              visible: false,
+              data: globalData['AE']['GDP_PPP_capita']
+            },{
+              name: "Сінгапур",
+              visible: false,
+              data: globalData['SG']['GDP_PPP_capita']
+            },{
+              name: "Франція",
+              visible: false,
+              data: globalData['FR']['GDP_PPP_capita']
             }]
           });
         </script>
