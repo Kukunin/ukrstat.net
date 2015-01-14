@@ -443,6 +443,49 @@
         });
         </script>
       </div>
+      <div class="chart">
+        <div id="chart6"><h3>Прямі іноземні інвестиції</h3></div>
+        <script type="text/javascript" charset="utf-8">
+          var chart = new Highcharts.Chart({
+            chart: {
+              type: 'area',
+              renderTo: 'chart6',
+              zoomType: 'x'
+            },
+            title: {
+              text: 'Прямі іноземні інвестиції',
+            },
+            subtitle: {
+              text: 'Source: <a href="http://www.ukrstat.gov.ua/operativ/operativ2014/zd/ivu/ivu_u/ivu0114.html">Державна служба статистики України</a>',
+            },
+
+            xAxis: {
+              categories: generateDates(2002, 2015)
+            },
+
+            yAxis: {
+              title: {
+                text: 'млн $'
+              },
+              min: 0
+            },
+
+            tooltip: {
+              valuePrefix: '$',
+              valueSuffix: ' млн.'
+            },
+
+            series: [{
+              name: "в Україну",
+              data: globalData['UA']['investments']['in']
+            }, {
+              name: "з України",
+              data: globalData['UA']['investments']['out']
+            }]
+
+          });
+        </script>
+      </div>
     </div>
 
     <div class="likes">
