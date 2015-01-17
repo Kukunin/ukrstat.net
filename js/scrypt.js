@@ -140,3 +140,9 @@ var globalData = {
     ]
   }
 }
+
+$(function() {
+  $(window).on('activate.bs.scrollspy', function (e) {
+    history.replaceState({}, "", $("a[href^='#']", e.target).attr("href"));
+  })
+});
