@@ -56,13 +56,13 @@
             <a href="#home" class="navbar-brand">Початок</a>
           </li>
           <li>
-            <a href="#GDP">ВВП України</a>
+            <a href="#budget">Бюджет України</a>
           </li>
           <li>
             <a href="#trade">Зовнішня торгівля</a>
           </li>
           <li>
-            <a href="#budget">Бюджет України</a>
+            <a href="#GDP">ВВП України</a>
           </li>
         </ul>
       </div>
@@ -73,6 +73,211 @@
     <div class="jumbotron">
       <h1>Україна в цифрах</h1>
       <p>на цій сторінці зібрано якомога більше статистичних даних про економіку України.</p>
+    </div>
+
+    <a name="budget" id="budget">&nbsp;</a>
+    <div>
+      <h2>Бюджет України</h2>
+      <div class="chart">
+        <h3>Фінальна версія бюджету на 2015 рік та порівняння з минулорічним</h3>
+        <p>Джерело: <a href="http://www.pravda.com.ua/cdn/cd1/budget/final/index.html">Українська правда</a></p>
+        <p class="budget-iframe-container" id="budget-iframe-container" style="height:1000px"> </p>
+        <script>
+        $('#budget').one('activate.charts', function() {
+          $('#budget-iframe-container').html('<iframe src="http://www.pravda.com.ua/cdn/cd1/budget/final/budget.html" width="1050" height="1000" frameborder="0" align="top"></iframe>');
+        });
+        </script>
+        <hr>
+        <p><b>Дані</b>: Закон про бюджет на 2015 рік, доступний за цим <a href="http://zakon2.rada.gov.ua/laws/show/80-19/page2">посиланням</a></p>
+        <p><b>Застереження</b>: для інфографіки використовуються дані з Загального Фонду Бюджету, без урахування Спецфонду як щодо Доходів, так і щодо Витрат.</p>
+        <p>"Розшифровка" деяких статей бюджету не проводилась. Але вона є по важливих, на думку редакції, напрямків бюджетної політики: Мінсоцполітики, Міністерства внутрішніх справ, охорони здоров'я тощо.</p>
+      </div>
+    </div>
+
+    <a name="trade" id="trade">&nbsp;</a>
+    <div>
+      <h2>Зовнішня торгівля / Foreign Trade</h2>
+      <div class="chart">
+        <div id="chart5" style="height:500px"><h3>Експорт та Імпорт України 2013</h3></div>
+        <script type="text/javascript" charset="utf-8">
+        $('#trade').one('activate.charts', function() {
+          var colors = Highcharts.getOptions().colors,
+              types = ['Експорт', 'Імпорт'],
+              subcategories = [[], [], [], [], []],
+              exports = [0, 0, 0, 0, 0],
+              imports = [0, 0, 0, 0, 0],
+              total = [0, 0];
+
+          //[name, category, export, import]
+          globalData['UA']['trade'][2013].forEach(function(value, key) {
+            exports[value[1]] += value[2];
+            imports[value[1]] += value[3];
+            total[0] += value[2];
+            total[1] += value[3];
+
+            subcategories[value[1]].push(value);
+          });
+
+          total = divideData(total, 1000, 2);
+
+          var data = [{
+            y: total[0],
+            color: colors[0],
+            drilldown: {
+              categories: tradeCategories,
+              data: divideData(exports, 1000, 2),
+            }
+          }, {
+            y: total[1],
+            color: colors[3],
+            drilldown: {
+              categories: tradeCategories,
+              data: divideData(imports, 1000, 2),
+            }
+          }];
+
+          var tradeData = [],
+              categoriesData = [],
+              subCategoriesData = [],
+              brightness;
+
+
+          // Build the data arrays
+          for (var i = 0; i < data.length; i += 1) {
+            var type = data[i];
+            // add browser data
+            tradeData.push({
+              name: types[i],
+              y: type.y,
+              color: type.color
+            });
+
+            // add version data
+            var drillDataLen = type.drilldown.data.length;
+            for (var j = 0; j < drillDataLen; j += 1) {
+              var category = type.drilldown.data[j];
+
+              brightness = 0.25 - (j / drillDataLen) / 4;
+              categoriesData.push({
+                name: type.drilldown.categories[j],
+                y: category,
+                color: Highcharts.Color(type.color).brighten(brightness).get()
+              });
+
+              var subCategoriesLength = subcategories[j].length;
+              for (var q = 0; q < subcategories[j].length; q++) {
+                var subcategory = subcategories[j][q],
+                    subbrightness = 0.10 - (q / subCategoriesLength) / 10;
+
+                subCategoriesData.push({
+                  name: subcategory[0],
+                  y: subcategory[i+2],
+                  color: Highcharts.Color(type.color).brighten(brightness-subbrightness-0.1).get()
+                });
+              }
+            }
+          }
+
+          // Create the chart
+          var chart = new Highcharts.Chart({
+            chart: {
+              renderTo: 'chart5',
+              type: 'pie',
+              height: 500
+            },
+            title: {
+              text: 'Експорт та Імпорт України 2013, млн $'
+            },
+            subtitle: {
+              text: 'Source: <a href="http://www.ukrstat.gov.ua/operativ/operativ2013/zd/tsztt/tsztt_u/tsztt1213_u.htm">Державна служба статистики України</a>',
+            },
+            plotOptions: {
+              pie: {
+                shadow: false,
+                center: ['50%', '50%']
+              }
+            },
+            tooltip: {
+              valuePrefix: '$',
+              valueSuffix: ' млн'
+            },
+            series: [{
+              name: 'Всього',
+              data: tradeData,
+              size: '40%',
+              dataLabels: {
+                color: 'white',
+                distance: -50
+              }
+            }, {
+              name: 'Всього',
+              data: categoriesData,
+              size: '70%',
+              innerSize: '40%',
+              dataLabels: {
+                enabled: false
+              }
+            }, {
+              name: 'Всього',
+              data: subCategoriesData,
+              size: '85%',
+              innerSize: '70%',
+              dataLabels: {
+                crop: false,
+                formatter: function() {
+                  return this.point.y > 4000000 ? '<b>' + truncate(this.point.name) + ':</b> $' + Highcharts.numberFormat(this.point.y, 2) + ' млн' : null;
+                }
+              }
+            }]
+          });
+        });
+        </script>
+      </div>
+      <div class="chart">
+        <div id="chart6" style="height:400px"><h3>Прямі іноземні інвестиції</h3></div>
+        <script type="text/javascript" charset="utf-8">
+        $('#trade').one('activate.charts', function() {
+          var chart = new Highcharts.Chart({
+            chart: {
+              type: 'area',
+              renderTo: 'chart6',
+              zoomType: 'x'
+            },
+            title: {
+              text: 'Прямі іноземні інвестиції',
+            },
+            subtitle: {
+              text: 'Source: <a href="http://www.ukrstat.gov.ua/operativ/operativ2014/zd/ivu/ivu_u/ivu0114.html">Державна служба статистики України</a>',
+            },
+
+            xAxis: {
+              categories: generateDates(2002, 2015)
+            },
+
+            yAxis: {
+              title: {
+                text: 'млн $'
+              },
+              min: 0
+            },
+
+            tooltip: {
+              valuePrefix: '$',
+              valueSuffix: ' млн.'
+            },
+
+            series: [{
+              name: "в Україну",
+              data: globalData['UA']['investments']['in']
+            }, {
+              name: "з України",
+              data: globalData['UA']['investments']['out']
+            }]
+
+          });
+        });
+        </script>
+      </div>
     </div>
 
     <a name="GDP" id="GDP">&nbsp;</a>
@@ -316,211 +521,6 @@
         </div>
       </div>
     </div><!-- GDP -->
-
-    <a name="trade" id="trade">&nbsp;</a>
-    <div>
-      <h2>Зовнішня торгівля / Foreign Trade</h2>
-      <div class="chart">
-        <div id="chart5" style="height:500px"><h3>Експорт та Імпорт України 2013</h3></div>
-        <script type="text/javascript" charset="utf-8">
-        $('#trade').one('activate.charts', function() {
-          var colors = Highcharts.getOptions().colors,
-              types = ['Експорт', 'Імпорт'],
-              subcategories = [[], [], [], [], []],
-              exports = [0, 0, 0, 0, 0],
-              imports = [0, 0, 0, 0, 0],
-              total = [0, 0];
-
-          //[name, category, export, import]
-          globalData['UA']['trade'][2013].forEach(function(value, key) {
-            exports[value[1]] += value[2];
-            imports[value[1]] += value[3];
-            total[0] += value[2];
-            total[1] += value[3];
-
-            subcategories[value[1]].push(value);
-          });
-
-          total = divideData(total, 1000, 2);
-
-          var data = [{
-            y: total[0],
-            color: colors[0],
-            drilldown: {
-              categories: tradeCategories,
-              data: divideData(exports, 1000, 2),
-            }
-          }, {
-            y: total[1],
-            color: colors[3],
-            drilldown: {
-              categories: tradeCategories,
-              data: divideData(imports, 1000, 2),
-            }
-          }];
-
-          var tradeData = [],
-              categoriesData = [],
-              subCategoriesData = [],
-              brightness;
-
-
-          // Build the data arrays
-          for (var i = 0; i < data.length; i += 1) {
-            var type = data[i];
-            // add browser data
-            tradeData.push({
-              name: types[i],
-              y: type.y,
-              color: type.color
-            });
-
-            // add version data
-            var drillDataLen = type.drilldown.data.length;
-            for (var j = 0; j < drillDataLen; j += 1) {
-              var category = type.drilldown.data[j];
-
-              brightness = 0.25 - (j / drillDataLen) / 4;
-              categoriesData.push({
-                name: type.drilldown.categories[j],
-                y: category,
-                color: Highcharts.Color(type.color).brighten(brightness).get()
-              });
-
-              var subCategoriesLength = subcategories[j].length;
-              for (var q = 0; q < subcategories[j].length; q++) {
-                var subcategory = subcategories[j][q],
-                    subbrightness = 0.10 - (q / subCategoriesLength) / 10;
-
-                subCategoriesData.push({
-                  name: subcategory[0],
-                  y: subcategory[i+2],
-                  color: Highcharts.Color(type.color).brighten(brightness-subbrightness-0.1).get()
-                });
-              }
-            }
-          }
-
-          // Create the chart
-          var chart = new Highcharts.Chart({
-            chart: {
-              renderTo: 'chart5',
-              type: 'pie',
-              height: 500
-            },
-            title: {
-              text: 'Експорт та Імпорт України 2013, млн $'
-            },
-            subtitle: {
-              text: 'Source: <a href="http://www.ukrstat.gov.ua/operativ/operativ2013/zd/tsztt/tsztt_u/tsztt1213_u.htm">Державна служба статистики України</a>',
-            },
-            plotOptions: {
-              pie: {
-                shadow: false,
-                center: ['50%', '50%']
-              }
-            },
-            tooltip: {
-              valuePrefix: '$',
-              valueSuffix: ' млн'
-            },
-            series: [{
-              name: 'Всього',
-              data: tradeData,
-              size: '40%',
-              dataLabels: {
-                color: 'white',
-                distance: -50
-              }
-            }, {
-              name: 'Всього',
-              data: categoriesData,
-              size: '70%',
-              innerSize: '40%',
-              dataLabels: {
-                enabled: false
-              }
-            }, {
-              name: 'Всього',
-              data: subCategoriesData,
-              size: '85%',
-              innerSize: '70%',
-              dataLabels: {
-                crop: false,
-                formatter: function() {
-                  return this.point.y > 4000000 ? '<b>' + truncate(this.point.name) + ':</b> $' + Highcharts.numberFormat(this.point.y, 2) + ' млн' : null;
-                }
-              }
-            }]
-          });
-        });
-        </script>
-      </div>
-      <div class="chart">
-        <div id="chart6" style="height:400px"><h3>Прямі іноземні інвестиції</h3></div>
-        <script type="text/javascript" charset="utf-8">
-        $('#trade').one('activate.charts', function() {
-          var chart = new Highcharts.Chart({
-            chart: {
-              type: 'area',
-              renderTo: 'chart6',
-              zoomType: 'x'
-            },
-            title: {
-              text: 'Прямі іноземні інвестиції',
-            },
-            subtitle: {
-              text: 'Source: <a href="http://www.ukrstat.gov.ua/operativ/operativ2014/zd/ivu/ivu_u/ivu0114.html">Державна служба статистики України</a>',
-            },
-
-            xAxis: {
-              categories: generateDates(2002, 2015)
-            },
-
-            yAxis: {
-              title: {
-                text: 'млн $'
-              },
-              min: 0
-            },
-
-            tooltip: {
-              valuePrefix: '$',
-              valueSuffix: ' млн.'
-            },
-
-            series: [{
-              name: "в Україну",
-              data: globalData['UA']['investments']['in']
-            }, {
-              name: "з України",
-              data: globalData['UA']['investments']['out']
-            }]
-
-          });
-        });
-        </script>
-      </div>
-    </div>
-
-    <a name="budget" id="budget">&nbsp;</a>
-    <div>
-      <h2>Бюджет України</h2>
-      <div class="chart">
-        <h3>Фінальна версія бюджету на 2015 рік та порівняння з минулорічним</h3>
-        <p>Джерело: <a href="http://www.pravda.com.ua/cdn/cd1/budget/final/index.html">Українська правда</a></p>
-        <p class="budget-iframe-container" id="budget-iframe-container" style="height:1000px"> </p>
-        <script>
-        $('#budget').one('activate.charts', function() {
-          $('#budget-iframe-container').html('<iframe src="http://www.pravda.com.ua/cdn/cd1/budget/final/budget.html" width="1050" height="1000" frameborder="0" align="top"></iframe>');
-        });
-        </script>
-        <hr>
-        <p><b>Дані</b>: Закон про бюджет на 2015 рік, доступний за цим <a href="http://zakon2.rada.gov.ua/laws/show/80-19/page2">посиланням</a></p>
-        <p><b>Застереження</b>: для інфографіки використовуються дані з Загального Фонду Бюджету, без урахування Спецфонду як щодо Доходів, так і щодо Витрат.</p>
-        <p>"Розшифровка" деяких статей бюджету не проводилась. Але вона є по важливих, на думку редакції, напрямків бюджетної політики: Мінсоцполітики, Міністерства внутрішніх справ, охорони здоров'я тощо.</p>
-      </div>
-    </div>
 
     <div class="likes">
       <div class="like">
