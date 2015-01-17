@@ -145,6 +145,9 @@ $(function() {
   $(window).on('activate.bs.scrollspy', function (e) {
     var href = $("a[href^='#']", e.target).attr("href")
     history.replaceState({}, "", href);
-    $(href).trigger('activate.charts');
+    $(window).trigger('hashchange');
   })
+  $(window).bind('hashchange', function() {
+    $(location.hash).trigger('activate.charts');
+  });
 });
