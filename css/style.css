@@ -19,3 +19,9 @@ a[name] {
 .likes .like + .like {
   margin-left: 1em;
 }
+.budget-iframe-container {
+  overflow:hidden;
+}
+.budget-iframe-container iframe {
+  margin-top:-7em;
+}
