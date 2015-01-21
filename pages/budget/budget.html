@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<!-- this file from http://www.pravda.com.ua/cdn/cd1/budget/final/budget.html -->
+<html >
+<head>
+  <meta charset="utf-8">
+  <script src="d3.v3.min.js"></script>
+  <script type="text/javascript" src="/js/jquery-2.1.3.min.js"></script>
+
+  <style>
+  .g-buttons {
+    font-family: Lucida Sans Unicode;
+    margin: 30px 0 0px 100px;
+  }
+
+  .g-buttons .g-button {
+    border: solid 1px #ddd;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.08);
+    height: 36px;
+  }
+
+  .g-buttons .g-button:hover {
+    border-color: #ccc;
+    border-bottom-color: #bbb;
+    box-shadow: 0 1px 2px rgba(0,0,0,.15);
+    color: #666;
+  }
+
+  .g-button {
+    background: #fff;
+    border: none;
+    border-radius: 3px;
+    border-bottom-color: #ccc;
+    color: #888;
+    cursor: pointer;
+    font: inherit;
+    font-size: 14px;
+    margin: 0 -1px 0 0;
+    padding: 4px 8px;
+    white-space: nowrap;
+  }
+
+  .g-buttons .g-button.g-active,
+  .g-buttons .g-button:active {
+    background: #f0f0f0;
+    border-color: #ccc;
+    border-top-color: #bbb;
+    box-shadow: inset 0 1px 2px rgba(0,0,0,.1);
+    color: #222;
+  }
+
+#tooltip {
+    font-family: arial;
+    color: #222;
+    background: #fff;
+    padding: .5em;
+    width: 220px;
+    border-radius: 2px;
+    box-shadow: 0px 0px 4px 0px #a6a6a6;
+    opacity: .9;
+    position: absolute;
+    text-align:  center;
+    font-size: 11px;
+    z-index:1000000;
+  }
+
+#tooltip.hidden {
+    display: none;
+  }
+
+#tooltip p {
+    margin: 0;
+    font-size: 10px;
+    line-height: 20px;
+    color:grey;
+  }
+
+  .hidden {
+    display: none;
+  }
+
+#searchbox {
+    font-family:verdana;
+    margin: 30px 0 10px 150px;
+    font-size: 14px;
+  }
+
+  input{
+    height:22px;
+  }
+  </style>
+</head>
+<body>
+
+  <div id="tooltip" class="hidden">
+    <p><span id="name" style="font-size: 13px;font-weight: bold;color:black; font-family: arial;" ></span></p> <hr noshade size="1">
+    стаття в 2015 р.: <span id="year2015_final" style="font-weight: bold; font-size: 14px; font-family: Century Gothic; color:black"></span> млн грн<p>
+    <hr noshade size="1">
+    різниця з 2014 р. в млн грн: <span id="year2015_dif_2014" style="font-weight: bold; font-size: 14px; font-family: Century Gothic; color:black"></span> <br>
+    різниця з 2014 р. у відсотках: <span id="year2015_dif_2014_percent" style="font-weight: bold;font-family: Century Gothic; font-size: 14px; color:black"></span>%<br>
+  </div>
+
+  <div style="position:relative; text-anchor: middle; left:100px; width: 600px;  top:10px; font-family: arial; padding:10px;font-size: 27px; color:black; ">   <b> Фінальна версія бюджету на 2015 рік та порівняння з минулорічним </b>
+  </div>
+
+  <div class="g-buttons">
+    <button id="budget" class="g-button">Доходи та Видатки</button>
+    <button id="income" class="g-button">Як змінились доходи?</button>
+    <button id="costs" class="g-button">Як змінились видатки?</button>
+  </div>
+
+  <div id="searchbox"  class="hidden" style="color:grey; ">Введіть для пошуку <input placeholder="статтю доходів або видатків" size="30" id="keywords" type="text"></div>
+    <div class="t1" id = "" style="position:absolute; text-anchor: middle; left:50px; width: 650px;  top:650px; font-family: Century Gothic; font-size: 14px; color:black; pointer-events: none;">
+  </div>
+
+  <div class="t1" id = "" style="position:absolute; text-anchor: middle; left:20px; width: 50px;  top:250px; font-family: Century Gothic; font-size: 16px; color:black; font-weight: bold; pointer-events: none;">
+ДОХОДИ</div>
+
+  <div class="t1" id = "" style="position:absolute; text-anchor: middle; left:620px; width: 50px;  top:250px; font-family: Century Gothic; font-size: 16px; color:black;font-weight: bold; pointer-events: none;">
+ВИДАТКИ</div>
+
+  <span class="t2" id = "" style="position:absolute; text-anchor: middle; left:120px; width: 50px;  top:250px; font-family: Century Gothic; font-size: 14px; color:black; font-weight: bold; pointer-events: none;">
+ ЗМЕНШЕННЯ &larr;</span>
+
+  <div class="t2" id = "" style="position:absolute; text-anchor: middle; left:520px; width: 50px;  top:250px; font-family: Century Gothic; font-size: 14px; color:black;font-weight: bold; pointer-events: none;">
+ЗРОСТАННЯ &rarr;</div>
+
+  <div class="t21" id = "" style="position:absolute; text-anchor: middle; left:80px; width: 250px;  top:670px; font-family: Century Gothic; font-size: 	12px; color:black;pointer-events: none;">
+    У порівнянні з першою версією проекту Бюджету на 2015 рік, Кабмін скоротив план надходжень як від <b>податку на прибуток</b>, так і від <b>податку на додану вартість</b>. Здається, в уряді більш реалістично оцінили стан економіки.
+  </div>
+
+  <div class="t21" id = "" style="position:absolute; text-anchor: middle; left:380px; width: 220px;  top:680px; font-family: Century Gothic; font-size: 	12px; color:black;pointer-events: none;">
+    З рентами на видобуток сталася цікава . Так, доходи від <b>ренти на видобуток нафти </b>знизились на третину. В той же час, від <b>видобутку газу</b> передбачене зростання на 121% у порівнянні з 2014 роком и на 41% - у порівнянні з першим проектом бюджету.  Видобуток нафти через "Укрнафту" контролює Ігор Коломойський. А ось головні по газу - Рінат Ахметов, Вадим Новинський та Микола Злочевський.
+  </div>
+
+  <div class="t21" id = "" style="position:absolute; text-anchor: middle; left:650px; width: 200px;  top:670px; font-family: Century Gothic; font-size: 	12px; color:black;pointer-events: none;">
+    Зі статей доходів за півтора тижні особливо стрімке зростання по <b>коштам, що повинен перерахувати Нацбанк</b> – більш ніж на 100%, або 64 млрд грн. Проте голова НБУ Валерія Гонтарєва вже заявила, що Уряд зможе розраховувати на 38 млрд грн. Тобто маємо потенційне недовиконання на 27 млрд грн.
+  </div>
+
+  <div class="t22" id = "" style="position:absolute; text-anchor: middle; left:50px; width: 200px;  top:620px; font-family: Century Gothic; font-size: 	12px; color:black;pointer-events: none;">
+    <b>Базова дотація </b>впала більш ніж на 90% - або на 55 млрд грн. Це частина децентралізації фінансів в бік перерозподілу між державним і місцевими бюджетами. Наприклад, 42 млрд передбачено на медичну субвенцію з Держбюджету до місцевих.
+  </div>
+
+  <div class="t22" id = "" style="position:absolute; text-anchor: middle; left:350px; width: 200px;  top:700px; font-family: Century Gothic; font-size: 	12px; color:black;pointer-events: none;">
+    Уряд частково прислухався до думки експертів, які звертали увагу на роздування <b>Пенсійного фонду</b>. За півтора тижні видатки скоротили на 7% (хоча порівняно з цим роком вони все одно збільшилися на 24%).
+  </div>
+
+  <div class="t22" id = "" style="position:absolute; text-anchor: middle; left:640px; width: 250px;  top:610px; font-family: Century Gothic; font-size: 	12px; color:black;pointer-events: none;">
+    Суттєво зріс військовий бюджет. <b>Міноборони</b> нададуть 39% проти 13-14% цього року и першому варіанті проекту бюджету. Ще близько 15 млрд військовим виділяли з резервного фонду, який в цьому році для цих цілей не планують передбачати. Так що зростання насправді не таке велике. Також, зросли витрати на <b>Нацгвардію</b>. У порівнянні з 2014 роком на 426%, з першим варіантом проекту бюджету – на 277%.
+  </div>
+
+  <div id="vis"></div>
+
+  <script>
+  //Width and height
+  var w = 950,
+      h = 750,
+      padding = 25;
+  d3.select("#searchbox").classed("hidden", false);
+
+  var svg = d3.select("#vis")
+    .append("svg")
+    .attr("width", w)
+    .attr("height", h);
+
+  d3.selectAll(".t21").transition().style("opacity", 0);
+  d3.selectAll(".t22").transition().style("opacity", 0);
+  d3.selectAll(".t2").style("opacity", 0);
+
+  var r = d3.scale.sqrt()
+    .domain([0, 823250])
+    .range([1, 200]);
+
+  d3.csv("dataset.csv", function (dataset) {
+    var force = d3.layout.force()
+      .nodes(dataset)
+      .size([w, h/1.5])
+      .charge(function(d){return - Math.pow(r(d.year2015_final), 2)/8})
+      .start();
+
+    var circle = svg.append("svg:g").selectAll(".circle")
+      .data(force.nodes())
+      .enter().append("svg:circle")
+      .attr('class', 'circle')
+      .attr("r", function(d) {return r(d.year2015_final)})
+      .style("fill", function (d){
+        if (d.cat=="costs"){return "#d73027"}
+        else {return "#1a9850"}
+      })
+      .attr("opacity", 1)
+      .attr ("stroke", "black")
+      .attr ("stroke-width", .5)
+      .on("mousemove", mouseover)
+      .on("mouseout",mouseout);
+
+    force.on("tick", function tick(e) {
+      var k = 5 * e.alpha;
+      dataset.forEach(function(d, i) {
+        d.x +=
+          d.cat=="income"? -k*4 :
+          -k;
+      });
+
+      svg.selectAll("circle")
+        .data(dataset)
+        .attr("transform", function(d) {return "translate(" + d.x + "," + d.y + ")";});
+    })
+
+    function mouseover(d) {
+      d3.select(this)
+        .attr ("stroke-width", 3)
+        .attr ("stroke", "black");
+
+      //Update the tooltip position and value
+      d3.select("#tooltip")
+        .style("left", (d3.event.pageX-150) + "px")
+        .style("top", (d3.event.pageY-80) + "px")
+        .select("#name")
+        .text(d.name);
+
+      d3.select("#tooltip")
+        .style("left", (d3.event.pageX-150) + "px")
+        .style("top", (d3.event.pageY-80) + "px")
+        .select("#year2015_final")
+        .text(d.year2015_final);
+
+      d3.select("#tooltip")
+        .style("left", (d3.event.pageX-150) + "px")
+        .style("top", (d3.event.pageY-80) + "px")
+        .select("#year2015_dif_2014")
+        .text(d.year2015_dif_2014);
+
+      d3.select("#tooltip")
+        .style("left", (d3.event.pageX+10) + "px")
+        .style("top", (d3.event.pageY-80) + "px")
+        .select("#year2015_dif_2014_percent")
+        .text(d.year2015_dif_2014_percent);
+
+      //Show the tooltip
+      d3.select("#tooltip").classed("hidden", false);
+    };
+
+    function mouseout(d) {
+      d3.select(this)
+        .attr ("stroke-width", .5);
+      d3.select("#tooltip").classed("hidden", true);
+    };
+
+    d3.select("#budget").classed("g-active", true);
+    d3.selectAll("button").on("click", buttons);
+
+    function buttons() {
+      var paragraphID = d3.select(this)
+        .attr("id");
+
+      if (paragraphID == "budget") {
+        d3.select("#budget").classed("g-active", true);
+        d3.select("#income").classed("g-active", false);
+        d3.select("#costs").classed("g-active", false);
+
+        d3.selectAll(".t1").transition().duration(1000).style("opacity", 1);
+        d3.selectAll(".t2").transition().duration(1000).style("opacity", 0);
+
+        d3.selectAll(".t21").transition().style("opacity", 0);
+        d3.selectAll(".t22").transition().style("opacity", 0);
+
+        d3.selectAll(".per").transition().attr("opacity", 0);
+        d3.selectAll(".line").transition().attr("opacity", 0);
+        force.start();
+        force.on("tick", function tick(e) {
+          svg.selectAll("circle")
+            .attr("r", function(d) {return r(d.year2015_final)});
+
+          var k = 5 * e.alpha;
+          dataset.forEach(function(d, i) {
+            d.x +=
+              d.cat=="income"? -k*4 :
+              -k;
+          });
+
+          svg.selectAll("circle").data(dataset).attr("transform", function(d) {return "translate(" + d.x + "," + d.y + ")";});
+        })
+      }
+
+      if (paragraphID == "income") {
+        d3.select("#budget").classed("g-active", false);
+        d3.select("#income").classed("g-active", true);
+        d3.select("#costs").classed("g-active", false);
+        d3.selectAll(".per").transition().attr("opacity", 1);
+        d3.selectAll(".line").transition().attr("opacity", 1);
+        d3.selectAll(".t1").transition().style("opacity", 0);
+        d3.selectAll(".t2").transition().style("opacity", 1);
+
+        d3.selectAll(".t21").transition().style("opacity", 1);
+        d3.selectAll(".t22").transition().style("opacity", 0);
+
+        force.start();
+        force.on("tick", function tick(e) {
+          var k = 5 * e.alpha;
+          dataset.forEach(function(d, i) {
+            d.x +=
+              d.cat=="costs"? k*14:
+              d.year2015_dif_2014_percent>0&&d.year2015_dif_2014_percent<5? -k*1 :
+              d.year2015_dif_2014_percent>5&&d.year2015_dif_2014_percent<10? -k*.7 :
+              d.year2015_dif_2014_percent>10&&d.year2015_dif_2014_percent<15? -k*.4 :
+              d.year2015_dif_2014_percent>15&&d.year2015_dif_2014_percent<20? -k*.1 :
+              d.year2015_dif_2014_percent>20&&d.year2015_dif_2014_percent<25? k*.2 :
+              d.year2015_dif_2014_percent>25&&d.year2015_dif_2014_percent<30? k*.5 :
+              d.year2015_dif_2014_percent>30&&d.year2015_dif_2014_percent<35? k*.8 :
+              d.year2015_dif_2014_percent>35&&d.year2015_dif_2014_percent<40? k*1.1 :
+              d.year2015_dif_2014_percent>40&&d.year2015_dif_2014_percent<45? k*1.4 :
+              d.year2015_dif_2014_percent>45&&d.year2015_dif_2014_percent<50? k*1.7 :
+              d.year2015_dif_2014_percent>50&&d.year2015_dif_2014_percent<55? k*2 :
+              d.year2015_dif_2014_percent>55&&d.year2015_dif_2014_percent<60? k*2.3 :
+              d.year2015_dif_2014_percent>60&&d.year2015_dif_2014_percent<65? k*2.6 :
+              d.year2015_dif_2014_percent>65&&d.year2015_dif_2014_percent<70? k*2.9 :
+              d.year2015_dif_2014_percent>70&&d.year2015_dif_2014_percent<75? k*3.2 :
+              d.year2015_dif_2014_percent>75&&d.year2015_dif_2014_percent<80? k*3.5 :
+              d.year2015_dif_2014_percentyear2015_dif_2014_percent>80&&d.year2015_dif_2014_percent<85? k*3.8 :
+              d.year2015_dif_2014_percent>85&&d.year2015_dif_2014_percent<90? k*4.1 :
+              d.year2015_dif_2014_percent>90&&d.year2015_dif_2014_percent<95? k*4.4 :
+              d.year2015_dif_2014_percent>95&&d.year2015_dif_2014_percent<100? k*4.7 :
+              d.year2015_dif_2014_percent>100? k*5 :
+              d.year2015_dif_2014_percent==0? -k :
+              d.year2015_dif_2014_percent<0&&d.year2015_dif_2014_percent>-5? -k*1.3 :
+              d.year2015_dif_2014_percent<-5&&d.year2015_dif_2014_percent>-10? -k*1.6 :
+              d.year2015_dif_2014_percent<-10&&d.year2015_dif_2014_percent>-15? -k*1.9 :
+              d.year2015_dif_2014_percent<-15&&d.year2015_dif_2014_percent>-20? -k*2.2 :
+              d.year2015_dif_2014_percent<-20&&d.year2015_dif_2014_percent>-25? -k*2.5 :
+              d.year2015_dif_2014_percent<-25&&d.year2015_dif_2014_percent>-30? -k*2.8 :
+              d.year2015_dif_2014_percent<-30&&d.year2015_dif_2014_percent>-35? -k*3.1 :
+              d.year2015_dif_2014_percent<-35&&d.year2015_dif_2014_percent>-40? -k*3.4 :
+              d.year2015_dif_2014_percent<-40&&d.year2015_dif_2014_percent>-45? -k*3.7 :
+              d.year2015_dif_2014_percent<-45&&d.year2015_dif_2014_percent>-50? -k*4 :
+              d.year2015_dif_2014_percent<-50&&d.year2015_dif_2014_percent>-55? -k*4.3 :
+              d.year2015_dif_2014_percent<-55&&d.year2015_dif_2014_percent>-60? -k*4.6 :
+              d.year2015_dif_2014_percent<-60&&d.year2015_dif_2014_percent>-65? -k*4.9 :
+              d.year2015_dif_2014_percent<-65&&d.year2015_dif_2014_percent>-70? -k*5.2 :
+              d.year2015_dif_2014_percent<-70&&d.year2015_dif_2014_percent>-75? -k*5.5 :
+              d.year2015_dif_2014_percent<-75&&d.year2015_dif_2014_percent>-80? -k*5.8 :
+              d.year2015_dif_2014_percent<-80&&d.year2015_dif_2014_percent>-85? -k*6.1 :
+              d.year2015_dif_2014_percent<-85&&d.year2015_dif_2014_percent>-90? -k*6.4 :
+              d.year2015_dif_2014_percent<-90&&d.year2015_dif_2014_percent>-95? -k*6.7 :
+              d.year2015_dif_2014_percent<-95&&d.year2015_dif_2014_percent>-100? -k*7 :
+              d.year2015_dif_2014_percent<-100? -k*7.3 :
+              k*12;
+          });
+
+          svg.selectAll("circle").data(dataset).attr("transform", function(d) {return "translate(" + d.x + "," + d.y + ")";});
+        })
+      }
+
+      if (paragraphID == "costs") {
+        d3.select("#budget").classed("g-active", false);
+        d3.select("#income").classed("g-active", false);
+        d3.select("#costs").classed("g-active", true);
+
+        d3.selectAll(".per").transition().attr("opacity", 1);
+        d3.selectAll(".line").transition().attr("opacity", 1);
+        d3.selectAll(".t1").transition().style("opacity", 0);
+        d3.selectAll(".t2").transition().style("opacity", 1);
+        d3.selectAll(".t21").transition().style("opacity", 0);
+        d3.selectAll(".t22").transition().style("opacity", 1);
+
+        force.start();
+        force.on("tick", function tick(e) {
+          var k = 5 * e.alpha;
+          dataset.forEach(function(d, i) {
+            d.x +=
+              d.cat=="income"? -k*14:
+              d.year2015_dif_2014_percent>0&&d.year2015_dif_2014_percent<5? -k*2 :
+              d.year2015_dif_2014_percent>5&&d.year2015_dif_2014_percent<10? -k*1.7 :
+              d.year2015_dif_2014_percent>10&&d.year2015_dif_2014_percent<15? -k*1.4 :
+              d.year2015_dif_2014_percent>15&&d.year2015_dif_2014_percent<20? -k*1.1 :
+              d.year2015_dif_2014_percent>20&&d.year2015_dif_2014_percent<25? -k*.8 :
+              d.year2015_dif_2014_percent>25&&d.year2015_dif_2014_percent<30? -k*.5 :
+              d.year2015_dif_2014_percent>30&&d.year2015_dif_2014_percent<35? -k*.2 :
+              d.year2015_dif_2014_percent>35&&d.year2015_dif_2014_percent<40? k*.1 :
+              d.year2015_dif_2014_percent>40&&d.year2015_dif_2014_percent<45? k*.4 :
+              d.year2015_dif_2014_percent>45&&d.year2015_dif_2014_percent<50? k*.7 :
+              d.year2015_dif_2014_percent>50&&d.year2015_dif_2014_percent<55? k*1 :
+              d.year2015_dif_2014_percent>55&&d.year2015_dif_2014_percent<60? k*1.3 :
+              d.year2015_dif_2014_percent>60&&d.year2015_dif_2014_percent<65? k*1.6 :
+              d.year2015_dif_2014_percent>65&&d.year2015_dif_2014_percent<70? k*1.9 :
+              d.year2015_dif_2014_percent>70&&d.year2015_dif_2014_percent<75? k*2.2 :
+              d.year2015_dif_2014_percent>75&&d.year2015_dif_2014_percent<80? k*2.5 :
+              d.year2015_dif_2014_percent>80&&d.year2015_dif_2014_percent<85? k*2.8 :
+              d.year2015_dif_2014_percent>85&&d.year2015_dif_2014_percent<90? k*3.1 :
+              d.year2015_dif_2014_percent>90&&d.year2015_dif_2014_percent<95? k*3.4 :
+              d.year2015_dif_2014_percent>95&&d.year2015_dif_2014_percent<100? k*3.7 :
+              d.year2015_dif_2014_percent>100? k*4 :
+              d.year2015_dif_2014_percent==0? -k :
+              d.year2015_dif_2014_percent<0&&d.year2015_dif_2014_percent>-5? -k*2.3 :
+              d.year2015_dif_2014_percent<-5&&d.year2015_dif_2014_percent>-10? -k*2.6 :
+              d.year2015_dif_2014_percent<-10&&d.year2015_dif_2014_percent>-15? -k*2.9 :
+              d.year2015_dif_2014_percent<-15&&d.year2015_dif_2014_percent>-20? -k*3.2 :
+              d.year2015_dif_2014_percent<-20&&d.year2015_dif_2014_percent>-25? -k*3.5 :
+              d.year2015_dif_2014_percent<-25&&d.year2015_dif_2014_percent>-30? -k*3.8 :
+              d.year2015_dif_2014_percent<-30&&d.year2015_dif_2014_percent>-35? -k*4.1 :
+              d.year2015_dif_2014_percent<-35&&d.year2015_dif_2014_percent>-40? -k*4.4 :
+              d.year2015_dif_2014_percent<-40&&d.year2015_dif_2014_percent>-45? -k*4.7 :
+              d.year2015_dif_2014_percent<-45&&d.year2015_dif_2014_percent>-50? -k*5 :
+              d.year2015_dif_2014_percent<-50&&d.year2015_dif_2014_percent>-55? -k*5.3 :
+              d.year2015_dif_2014_percent<-55&&d.year2015_dif_2014_percent>-60? -k*5.6 :
+              d.year2015_dif_2014_percent<-60&&d.year2015_dif_2014_percent>-65? -k*5.9 :
+              d.year2015_dif_2014_percent<-65&&d.year2015_dif_2014_percent>-70? -k*6.2 :
+              d.year2015_dif_2014_percent<-70&&d.year2015_dif_2014_percent>-75? -k*6.5 :
+              d.year2015_dif_2014_percent<-75&&d.year2015_dif_2014_percent>-80? -k*6.8 :
+              d.year2015_dif_2014_percent<-80&&d.year2015_dif_2014_percent>-85? -k*7.1 :
+              d.year2015_dif_2014_percent<-85&&d.year2015_dif_2014_percent>-90? -k*7.4 :
+              d.year2015_dif_2014_percent<-90&&d.year2015_dif_2014_percent>-95? -k*7.7 :
+              d.year2015_dif_2014_percent<-95&&d.year2015_dif_2014_percent>-100? -k*8 :
+              d.year2015_dif_2014_percent<-100? -k*8.3 :
+              k*12;
+            });
+
+            svg.selectAll("circle").data(dataset).attr("transform", function(d) {return "translate(" + d.x + "," + d.y + ")";});
+        })
+      }
+    }
+
+    svg.selectAll(".per")
+      .data(["<-100%","-40%","+0%","+40%",">+100%"])
+      .enter().append("text")
+      .attr("class", "per")
+      .text(function(d) { return d})
+      .attr("x", function(d,i) { return 20+i*160 })
+      .attr("y", 80)
+      .attr("opacity", 0)
+      .attr("dy", ".35em")
+      .attr("font-family", "sans-serif")
+      .attr("font-size", "12px");
+
+    svg.append("line")
+      .attr("stroke", "black")
+      .attr("class", "line")
+      .attr("id", "line")
+      .attr("opacity", 0)
+      .attr("stroke-width", 2)
+      .attr("x1", 345)
+      .attr("y1", 100)
+      .attr("x2", 345)
+      .attr("y2", 420);
+
+    svg.append("line")
+      .attr("stroke", "black")
+      .attr("class", "t21")
+      .attr("id", "line")
+      .attr("opacity", 0)
+      .attr("stroke-width", .5)
+      .attr("stroke-dasharray", 2, .1)
+      .attr("x1", 250)
+      .attr("y1", 320)
+      .attr("x2", 250)
+      .attr("y2", 430);
+
+    svg.append("line")
+      .attr("stroke", "black")
+      .attr("class", "t21")
+      .attr("id", "line")
+      .attr("opacity", 0)
+      .attr("stroke-width", .5)
+      .attr("stroke-dasharray", 2, .1)
+      .attr("x1", 700)
+      .attr("y1", 290)
+      .attr("x2", 700)
+      .attr("y2", 430);
+
+    svg.append("line")
+      .attr("stroke", "black")
+      .attr("class", "t22")
+      .attr("id", "line")
+      .attr("opacity", 0)
+      .attr("stroke-width", .5)
+      .attr("stroke-dasharray", 2, .1)
+      .attr("x1", 750)
+      .attr("y1", 330)
+      .attr("x2", 750)
+      .attr("y2", 380);
+
+    svg.append("line")
+      .attr("stroke", "black")
+      .attr("class", "t22")
+      .attr("id", "line")
+      .attr("opacity", 0)
+      .attr("stroke-width", .5)
+      .attr("stroke-dasharray", 2, .1)
+      .attr("x1", 450)
+      .attr("y1", 330)
+      .attr("x2", 450)
+      .attr("y2", 470);
+
+    svg.append("line")
+      .attr("stroke", "grey")
+      .attr("class", "t22")
+      .attr("id", "line")
+      .attr("opacity", 0)
+      .attr("stroke-width", .5)
+      .attr("stroke-dasharray", 2, .1)
+      .attr("x1", 100)
+      .attr("y1", 290)
+      .attr("x2", 100)
+      .attr("y2", 380);
+
+    /////////////////
+
+    $("input").keyup(function () {
+      var value = $(this).val();
+      if(value){
+        var i = 0;
+        var re = new RegExp(value,"i");
+
+        dataset.forEach(function(d){
+          if (!dataset[i].name.match(re)){
+            d3.select(circle[0][i])
+              .attr ("opacity", .1);
+          } else {
+            d3.select(circle[0][i])
+              .attr("opacity", 1);
+          }
+          i++;
+        });
+      } else {
+        circle.attr("opacity", 1);
+      }
+    }).keyup();
+
+    ////////////////////////////////////////
+
+    var g = svg.append("g")
+      .attr("id", "key")
+      .attr("class", "hiden")
+      .attr("transform", "translate(250,700)");
+
+    g.selectAll(".key_size")
+      .data([10000, 1000])
+      .enter().append("ellipse")
+      .style("stroke", "black" )
+      .style("fill", "none" )
+      .attr("rx", function(d){return r(d)})
+      .attr("ry", function(d){return r(d)})
+      .attr("cx", function(d,i){return i*100})
+      .attr("cy", 0);
+
+    g.append("text")
+      .attr("class", "key_text_maine")
+      .attr("x",-100)
+      .attr("y", -30)
+      .attr("style", 'font-size: 12px;fill: black; font-weight: bold; font-family: verdana;' )
+      .text("Розмір показує кількість грошей за цією статтею:");
+    g.append("text")
+      .attr("class", "key_text_maine")
+      .attr("x",20)
+      .attr("y", 20)
+      .attr("style", 'font-size: 12px;fill: black;  font-family: verdana;' )
+      .text("10 млрд");
+    g.append("text")
+      .attr("class", "key_text_maine")
+      .attr("x",100)
+      .attr("y", 20)
+      .attr("style", 'font-size: 12px;fill: black;  font-family: verdana;' )
+      .text("1 млрд грн");
+  })
+  </script>
+</body>
+</html>
