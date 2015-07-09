@@ -234,6 +234,51 @@
         </script>
       </div>
       <div class="chart">
+        <div id="chart7" style="height:400px"><h3>Обсяг експорту/імпорту України</h3></div>
+        <script type="text/javascript" charset="utf-8">
+        $('#trade').one('activate.charts', function() {
+          var chart = new Highcharts.Chart({
+            chart: {
+              renderTo: 'chart7',
+              zoomType: 'x'
+            },
+            title: {
+              text: 'Обсяг експорту/імпорту України, млрд. $',
+            },
+            subtitle: {
+              text: 'Source: <a href="http://www.ukrstat.gov.ua/operativ/operativ2014/zd/tsztt/tsztt_u/arh_tsztt2014_u.html">Державна служба статистики України</a>',
+            },
+
+            xAxis: {
+              categories: generateDates(2002, 2014)
+            },
+
+            yAxis: {
+              title: {
+                text: 'млрд. $'
+              },
+              min: 0
+            },
+
+            tooltip: {
+              valuePrefix: '$',
+              valueSuffix: ' млрд.'
+            },
+
+            series: [{
+              name: "Імпорт",
+              data: divideData(globalData['UA']['trade']['import'], 1000*1000, 2)
+            }, {
+              name: "Експорт",
+              data: divideData(globalData['UA']['trade']['export'], 1000*1000, 2)
+            }]
+
+          });
+        });
+        </script>
+        <p>* З 2010 року: Без урахування тимчасово окупованої території Автономної Республіки Крим і м.Севастополя.</p>
+      </div>
+      <div class="chart">
         <div id="chart6" style="height:400px"><h3>Прямі іноземні інвестиції</h3></div>
         <script type="text/javascript" charset="utf-8">
         $('#trade').one('activate.charts', function() {
