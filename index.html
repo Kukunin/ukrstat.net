@@ -98,7 +98,7 @@
     <div>
       <h2>Зовнішня торгівля / Foreign Trade</h2>
       <div class="chart">
-        <div id="chart5" style="height:500px"><h3>Експорт та Імпорт України 2013</h3></div>
+        <div id="chart5" style="height:500px"><h3>Структура Експорту та Імпорту України 2014</h3></div>
         <script type="text/javascript" charset="utf-8">
         $('#trade').one('activate.charts', function() {
           var colors = Highcharts.getOptions().colors,
@@ -109,7 +109,7 @@
               total = [0, 0];
 
           //[name, category, export, import]
-          globalData['UA']['trade'][2013].forEach(function(value, key) {
+          globalData['UA']['trade'][2014].forEach(function(value, key) {
             exports[value[1]] += value[2];
             imports[value[1]] += value[3];
             total[0] += value[2];
@@ -171,7 +171,7 @@
 
                 subCategoriesData.push({
                   name: subcategory[0],
-                  y: subcategory[i+2],
+                  y: divideNumber(subcategory[i+2], 1000, 2),
                   color: Highcharts.Color(type.color).brighten(brightness-subbrightness-0.1).get()
                 });
               }
@@ -186,10 +186,10 @@
               height: 500
             },
             title: {
-              text: 'Експорт та Імпорт України 2013, млн $'
+              text: 'Структура Експорту та Імпорту України 2014, млн $'
             },
             subtitle: {
-              text: 'Source: <a href="http://www.ukrstat.gov.ua/operativ/operativ2013/zd/tsztt/tsztt_u/tsztt1213_u.htm">Державна служба статистики України</a>',
+              text: 'Source: <a href="http://www.ukrstat.gov.ua/operativ/operativ2014/zd/tsztt/tsztt_u/tsztt1314_u.htm">Державна служба статистики України</a>',
             },
             plotOptions: {
               pie: {
